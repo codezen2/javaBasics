@@ -1,21 +1,22 @@
 package com.sapient.vo;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 public class Emp implements Comparable<Emp>{
 	private int empId;
 	private String empName;
 	private double sal;
 	private int deptId;
-	private LocalDate doj;
+	private Date doj;
 
-	public Emp(int empId, String empName, double sal, int deptId, LocalDate doj) {
+	public Emp(int empId, String empName, double sal, int deptId, Date datel) {
 		super();
 		this.empId = empId;
 		this.empName = empName;
 		this.sal = sal;
 		this.deptId = deptId;
-		this.doj = doj;
+		this.doj = datel;
 	}
 
 	public void setSal(double sal) {
@@ -38,7 +39,7 @@ public class Emp implements Comparable<Emp>{
 		return deptId;
 	}
 
-	public LocalDate getDoj() {
+	public Date getDoj() {
 		return doj;
 	}
 

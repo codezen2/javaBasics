@@ -2,6 +2,7 @@ package com.sapient.dao;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +16,9 @@ public class EmpMemDao implements IDao  {
 	static
 	{
 		emap=new HashMap<Integer,Emp>();
-		emap.put(1001,new Emp(1001,"ram",45000,1,LocalDate.of(2015, 7, 21)));
-		emap.put(1002,new Emp(1002,"tom",50000,1,LocalDate.of(2017, 9, 17)));
-		emap.put(1003,new Emp(1003,"sam",35000,1,LocalDate.of(2013, 7, 13)));
+		emap.put(1001,new Emp(1001,"ram",45000,1,new Date(2015, 7, 21)));
+		emap.put(1002,new Emp(1002,"tom",50000,1,new Date(2017, 9, 17)));
+		emap.put(1003,new Emp(1003,"sam",35000,1,new Date(2013, 7, 13)));
 	}
 	@Override
 	public List<Emp> viewEmployee() {

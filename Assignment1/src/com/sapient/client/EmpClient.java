@@ -1,7 +1,11 @@
 package com.sapient.client;
 
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -52,7 +56,8 @@ public class EmpClient {
 		case ADD:
 			add();
 			break;
-		case EDIT:updateSal();
+		case EDIT:
+			updateSal();
 			break;
 		default:
 			break;
@@ -61,10 +66,18 @@ public class EmpClient {
 	}
 
 	public static void viewAll() {
-		List<Emp> lst = dao.viewEmployee();
-		for (Emp emp : lst) {
-			System.out.println(emp);
+		List<Emp> lst;
+		try {
+			System.out.println(" viewall fxn");
+			lst = dao.viewEmployee();
+			System.out.println("sdsads "+lst.size());
+			for (Emp emp : lst) {
+				System.out.println(emp);
+			}
+		} catch (SQLException | ParseException e) {
+		System.out.println(e.getMessage()+"   "+e);
 		}
+
 	}
 
 	public static void deletebyId() {
@@ -73,7 +86,7 @@ public class EmpClient {
 		try {
 			int a = dao.removeEmployee(id);
 			System.out.println("DELETED SUCCESSFULLLY");
-		} catch (NotfoundException e) {
+		} catch (NotfoundException | SQLException e) {
 			System.out.println(e.getMessage());
 		}
 
@@ -86,11 +99,12 @@ public class EmpClient {
 		try {
 			emp = dao.viewEmployee(id);
 			System.out.println(emp);
-		} catch (NotfoundException e) {
+		} catch (NotfoundException | ParseException | SQLException e) {
 			System.out.println(e.getMessage());
 		}
 
 	}
+
 	public static void updateSal() {
 		System.out.println("Enter the Id to Fetch data for:");
 		int id = scan.nextInt();
@@ -98,9 +112,9 @@ public class EmpClient {
 		double sal = scan.nextDouble();
 		Emp emp;
 		try {
-			int a=dao.updateEmployee(id, sal);
+			int a = dao.updateEmployee(id, sal);
 			System.out.println("Updated Success");
-		} catch (NotfoundException e) {
+		} catch (NotfoundException | SQLException e) {
 			System.out.println(e.getMessage());
 		}
 
@@ -117,14 +131,15 @@ public class EmpClient {
 		int did = scan.nextInt();
 		System.out.println("Enter the Date of joining (dd-mm-yyyy)");
 		String strDt = scan.next();
-		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-		LocalDate doj = LocalDate.parse(strDt, df);
-		Emp emp = new Emp(id, name, salr, did, doj);
+		// DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		// LocalDate doj = LocalDate.parse(strDt, df);
+		Date d = null;
 		try {
+			d = new SimpleDateFormat("dd/MM/yyyy").parse(strDt);
+			Emp emp = new Emp(id, name, salr, did, d);
 			int a = dao.addEmployee(emp);
 			System.out.println("Successfully Added");
-		} catch (IdException e) {
-			// TODO Auto-generated catch block
+		} catch (IdException | SQLException | ParseException e) {
 			System.out.println(e.getMessage());
 		}
 

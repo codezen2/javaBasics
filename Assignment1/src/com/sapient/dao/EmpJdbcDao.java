@@ -5,12 +5,18 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import com.sapient.exception.IdException;
 import com.sapient.exception.NotfoundException;
+import com.sapient.vo.Dept;
 import com.sapient.vo.Emp;
 
 public class EmpJdbcDao implements IDao {
@@ -20,85 +26,125 @@ public class EmpJdbcDao implements IDao {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			String url = "jdbc:oracle:thin:@localhost:1521:xe"; // for same pc
-			conn = DriverManager.getConnection(url, "system", "Sapient123");
+			conn = DriverManager.getConnection(url, "system", "system");
 		} catch (SQLException | ClassNotFoundException e) {
 			System.out.println(e);
 		}
 	}
 
 	@Override
-	public List<Emp> viewEmployee() {
+	public List<Emp> viewEmployee() throws SQLException, ParseException {
+		System.out.println("test viewall");
 		String sql = null;
+		Emp emp = null;
+		List<Emp> lst = new ArrayList<Emp>();
+		lst = null;
 		PreparedStatement st = null;
 		sql = "select * from sap_emp";
-		try {
-			st = conn.prepareStatement(sql);
-			ResultSet rs = st.executeQuery();
-			System.out.printf("%10s%20s%20s%10s%20s", "ID", "Name", "SAL", "DID", "DOJ");
-			System.out.println("\n_______________________________________________________________________________");
-			while (rs.next()) {
-				int id = rs.getInt("EID");
-				String name = rs.getString("ename");
-				double sal = rs.getDouble("sal");
-				int did = rs.getInt("dept_id");
-				String doj = rs.getString("doj");
-				System.out.printf("\n%10d%20s%20.2f%10d%20s", id, name, sal, did, doj);
-			}
-			System.out.println("\n______________________________________________________________________________");
+		st = conn.prepareStatement(sql);
+		System.out.println("test st");
 
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+		ResultSet rs = st.executeQuery();
+		System.out.println("test rs");
+
+		System.out.println(rs.getString("ename"));
+
+		while (rs.next()) {
+			int id = rs.getInt("eid");
+			String name = rs.getString("ename");
+			double sal = rs.getDouble("sal");
+			int did = rs.getInt("dept_id");
+			String doj = rs.getString("doj");
+			Date datel = new SimpleDateFormat("dd/MM/yyyy").parse(doj);
+			System.out.println(id+" "+sal+" "+doj);
+			emp = new Emp(id, name, sal, did, datel);
+			lst.add(id, emp);
 		}
-		return null;
+		return lst;
 	}
 
 	@Override
-	public Emp viewEmployee(int eid) throws NotfoundException {
-		String sql="select * from sap_emp where dept_id=?";
+	public Emp viewEmployee(int eid) throws NotfoundException, ParseException, SQLException {
+		String sql = "select * from sap_emp where eid=?";
 		PreparedStatement st;
-		try {
-			st = conn.prepareStatement(sql);
-			st.setDouble(1,eid); // sets value in prepared statement
-			ResultSet rs=st.executeQuery();
-			System.out.printf("%10s%20s%20s%10s%20s","ID","Name","SAL","DID","DOJ");
-			System.out.println("\n_______________________________________________________________________________");
-			while(rs.next())
-			{
-				int id=rs.getInt("EID");
-				String name=rs.getString("ename");
-				double sal=rs.getDouble("sal");
-				int did=rs.getInt("dept_id");
-				String doj=rs.getString("doj");
-				//System.out.println(id+" "+name+" "+sal+" "+did);
-				System.out.printf("\n%10d%20s%20.2f%10d%20s",id,name,sal,did,doj);
-
-			}
-			System.out.println("\n______________________________________________________________________________");
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		Emp emp = null;
+		st = conn.prepareStatement(sql);
+		st.setDouble(1, eid); // sets value in prepared statement
+		ResultSet rs = st.executeQuery();
+		while (rs.next()) {
+			int id = rs.getInt("EID");
+			String name = rs.getString("ename");
+			double sal = rs.getDouble("sal");
+			int did = rs.getInt("dept_id");
+			String doj = rs.getString("doj");
+			Date datel = new SimpleDateFormat("dd/MM/yyyy").parse(doj);
+			emp = new Emp(id, name, sal, did, datel);
 		}
-
-	return null;
+		conn.close();
+		return emp;
 	}
 
 	@Override
-	public int addEmployee(Emp emp) throws IdException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int addEmployee(Emp emp) throws IdException, SQLException {
+		String sql = "insert into sap_emp values(?,?,?,?,?)";
+		PreparedStatement st = conn.prepareStatement(sql);
+		int id = emp.getEmpId();
+		String name = emp.getEmpName();
+		double sal = emp.getSal();
+		int did = emp.getDeptId();
+		Date d = new Date(System.currentTimeMillis());
+		st.setInt(1, id);
+		st.setString(2, name);
+		st.setDouble(3, sal);
+		st.setInt(4, did);
+		st.setDate(5, (java.sql.Date) d);
+		int rows = st.executeUpdate();
+		conn.close();
+
+		return 1;
 	}
 
 	@Override
-	public int removeEmployee(int eid) throws NotfoundException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int removeEmployee(int eid) throws NotfoundException, SQLException {
+		String sql = "DELETE FROM sap_emp WHERE eid=?;";
+		PreparedStatement st = conn.prepareStatement(sql);
+		st.setDouble(1, eid);
+		int rows = st.executeUpdate();
+		conn.close();
+
+		return rows;
 	}
 
 	@Override
-	public int updateEmployee(int eid, double sal) throws NotfoundException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int updateEmployee(int eid, double sal) throws NotfoundException, SQLException {
+		int rows = 0;
+		String sql = "update sap_emp set sal=? where eid=?";
+		PreparedStatement st = conn.prepareStatement(sql);
+		st.setDouble(2, eid);
+		st.setDouble(1, sal);
+		rows = st.executeUpdate();
+		conn.close();
+
+		return rows;
 	}
 
+	public List<Dept> getDepts() throws SQLException, ParseException {
+		String sql = null;
+		List<Dept> lst = new ArrayList<Dept>();
+		lst = null;
+		PreparedStatement st = null;
+		sql = "select * from sap_dept";
+		Dept d=null;
+		st = conn.prepareStatement(sql);
+		ResultSet rs = st.executeQuery();
+		while (rs.next()) {
+			int id = rs.getInt("did");
+			String name = rs.getString("dname");
+			d=new Dept(id, name);
+			lst.add(id, d);
+		}
+		conn.close();
+
+		return lst;
+	}
 }
