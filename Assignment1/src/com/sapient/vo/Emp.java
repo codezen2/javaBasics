@@ -8,15 +8,15 @@ public class Emp implements Comparable<Emp>{
 	private String empName;
 	private double sal;
 	private int deptId;
-	private Date doj;
+	private LocalDate doj;
 
-	public Emp(int empId, String empName, double sal, int deptId, Date datel) {
+	public Emp(int empId, String empName, double sal, int deptId, LocalDate date) {
 		super();
 		this.empId = empId;
 		this.empName = empName;
 		this.sal = sal;
 		this.deptId = deptId;
-		this.doj = datel;
+		this.doj = date;
 	}
 
 	public void setSal(double sal) {
@@ -39,7 +39,7 @@ public class Emp implements Comparable<Emp>{
 		return deptId;
 	}
 
-	public Date getDoj() {
+	public LocalDate getDoj() {
 		return doj;
 	}
 

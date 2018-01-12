@@ -12,6 +12,7 @@ import java.util.Scanner;
 import javax.swing.text.DateFormatter;
 
 import com.sapient.dao.DaoFactory;
+import com.sapient.dao.EmpJdbcDao;
 import com.sapient.dao.IDao;
 import com.sapient.exception.IdException;
 import com.sapient.exception.NotfoundException;
@@ -34,12 +35,12 @@ public class EmpClient {
 				emenu = Menu.valueOf(menuStr.toUpperCase());
 				processMenu(emenu);
 			} catch (Exception ex) {
-				System.out.println("Invalid Menu Option");
+				System.out.println("Invalid Menu Option " + ex);
 			}
 			System.out.println("Press \'y\' to Continue");
 			opt = scan.next();
 		} while (opt.equals("y"));
-
+		EmpJdbcDao.closeconn();
 	}
 
 	public static void processMenu(Menu menu) {
@@ -70,12 +71,12 @@ public class EmpClient {
 		try {
 			System.out.println(" viewall fxn");
 			lst = dao.viewEmployee();
-			System.out.println("sdsads "+lst.size());
+			System.out.println("sdsads " + lst.size());
 			for (Emp emp : lst) {
 				System.out.println(emp);
 			}
 		} catch (SQLException | ParseException e) {
-		System.out.println(e.getMessage()+"   "+e);
+			System.out.println(e.getMessage() + "   " + e);
 		}
 
 	}
@@ -131,17 +132,15 @@ public class EmpClient {
 		int did = scan.nextInt();
 		System.out.println("Enter the Date of joining (dd-mm-yyyy)");
 		String strDt = scan.next();
-		// DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-		// LocalDate doj = LocalDate.parse(strDt, df);
-		Date d = null;
+		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		LocalDate doj = LocalDate.parse(strDt, df);
+		Emp emp = new Emp(id, name, salr, did, doj);
 		try {
-			d = new SimpleDateFormat("dd/MM/yyyy").parse(strDt);
-			Emp emp = new Emp(id, name, salr, did, d);
 			int a = dao.addEmployee(emp);
-			System.out.println("Successfully Added");
-		} catch (IdException | SQLException | ParseException e) {
+		} catch (IdException | SQLException e) {
 			System.out.println(e.getMessage());
 		}
+		System.out.println("Successfully Added");
 
 	}
 }

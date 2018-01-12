@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +27,7 @@ public class EmpJdbcDao implements IDao {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			String url = "jdbc:oracle:thin:@localhost:1521:xe"; // for same pc
-			conn = DriverManager.getConnection(url, "system", "system");
+			conn = DriverManager.getConnection(url, "system", "Sapient123");
 		} catch (SQLException | ClassNotFoundException e) {
 			System.out.println(e);
 		}
@@ -34,30 +35,25 @@ public class EmpJdbcDao implements IDao {
 
 	@Override
 	public List<Emp> viewEmployee() throws SQLException, ParseException {
-		System.out.println("test viewall");
-		String sql = null;
 		Emp emp = null;
 		List<Emp> lst = new ArrayList<Emp>();
-		lst = null;
-		PreparedStatement st = null;
-		sql = "select * from sap_emp";
-		st = conn.prepareStatement(sql);
-		System.out.println("test st");
-
+		String sql = "select * from sap_emp";
+		PreparedStatement st = conn.prepareStatement(sql);
 		ResultSet rs = st.executeQuery();
-		System.out.println("test rs");
-
-		System.out.println(rs.getString("ename"));
-
+		int id = 0;
+		double sal = 0.0;
+		int did = 0;
+		java.sql.Date doj = null;
+		String name=null;
 		while (rs.next()) {
-			int id = rs.getInt("eid");
-			String name = rs.getString("ename");
-			double sal = rs.getDouble("sal");
-			int did = rs.getInt("dept_id");
-			String doj = rs.getString("doj");
-			Date datel = new SimpleDateFormat("dd/MM/yyyy").parse(doj);
-			System.out.println(id+" "+sal+" "+doj);
-			emp = new Emp(id, name, sal, did, datel);
+			id = rs.getInt("eid");
+			name = rs.getString("ename");
+			sal = rs.getDouble("sal");
+			did = rs.getInt("dept_id");
+			doj = rs.getDate("doj");
+			DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-dd-MM");
+			LocalDate date = LocalDate.parse(doj.toString(), df);
+			emp = new Emp(id, name, sal, did, date);
 			lst.add(id, emp);
 		}
 		return lst;
@@ -69,7 +65,7 @@ public class EmpJdbcDao implements IDao {
 		PreparedStatement st;
 		Emp emp = null;
 		st = conn.prepareStatement(sql);
-		st.setDouble(1, eid); // sets value in prepared statement
+		st.setDouble(1, eid);
 		ResultSet rs = st.executeQuery();
 		while (rs.next()) {
 			int id = rs.getInt("EID");
@@ -77,10 +73,10 @@ public class EmpJdbcDao implements IDao {
 			double sal = rs.getDouble("sal");
 			int did = rs.getInt("dept_id");
 			String doj = rs.getString("doj");
-			Date datel = new SimpleDateFormat("dd/MM/yyyy").parse(doj);
-			emp = new Emp(id, name, sal, did, datel);
+			DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-dd-MM HH:mm:SS");
+			LocalDate date = LocalDate.parse(doj, df);
+			emp = new Emp(id, name, sal, did, date);
 		}
-		conn.close();
 		return emp;
 	}
 
@@ -99,7 +95,6 @@ public class EmpJdbcDao implements IDao {
 		st.setInt(4, did);
 		st.setDate(5, (java.sql.Date) d);
 		int rows = st.executeUpdate();
-		conn.close();
 
 		return 1;
 	}
@@ -110,7 +105,6 @@ public class EmpJdbcDao implements IDao {
 		PreparedStatement st = conn.prepareStatement(sql);
 		st.setDouble(1, eid);
 		int rows = st.executeUpdate();
-		conn.close();
 
 		return rows;
 	}
@@ -120,11 +114,10 @@ public class EmpJdbcDao implements IDao {
 		int rows = 0;
 		String sql = "update sap_emp set sal=? where eid=?";
 		PreparedStatement st = conn.prepareStatement(sql);
-		st.setDouble(2, eid);
 		st.setDouble(1, sal);
+		st.setDouble(2, eid);
 		rows = st.executeUpdate();
 		conn.close();
-
 		return rows;
 	}
 
@@ -134,17 +127,25 @@ public class EmpJdbcDao implements IDao {
 		lst = null;
 		PreparedStatement st = null;
 		sql = "select * from sap_dept";
-		Dept d=null;
+		Dept d = null;
 		st = conn.prepareStatement(sql);
 		ResultSet rs = st.executeQuery();
 		while (rs.next()) {
 			int id = rs.getInt("did");
 			String name = rs.getString("dname");
-			d=new Dept(id, name);
+			d = new Dept(id, name);
 			lst.add(id, d);
 		}
-		conn.close();
-
 		return lst;
+	}
+
+	public static void closeconn() {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }
