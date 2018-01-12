@@ -3,6 +3,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ConversionDemo {
 
@@ -23,6 +24,11 @@ public class ConversionDemo {
 		LocalDate ldt2=sqldt.toLocalDate();
 		System.out.println("Local date: "+ ldt2);
 		
+		String strDt ="2012-01-03 00:00:00";
+		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-dd-MM HH:mm:SS");
+		LocalDate doj = LocalDate.parse(strDt, df);
+		System.out.println("Local date: "+ doj);
+
 	}
 
 }

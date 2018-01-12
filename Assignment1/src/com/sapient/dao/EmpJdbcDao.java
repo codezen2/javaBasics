@@ -43,18 +43,20 @@ public class EmpJdbcDao implements IDao {
 		int id = 0;
 		double sal = 0.0;
 		int did = 0;
-		java.sql.Date doj = null;
-		String name=null;
+		String doj = null;
+		String name = null;
 		while (rs.next()) {
 			id = rs.getInt("eid");
 			name = rs.getString("ename");
 			sal = rs.getDouble("sal");
 			did = rs.getInt("dept_id");
-			doj = rs.getDate("doj");
-			DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-dd-MM");
+			doj = rs.getString("doj");
+			DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:SS");
 			LocalDate date = LocalDate.parse(doj.toString(), df);
+			System.out.println(id + " " + name + " " + sal + " " + did + " " + date);
+
 			emp = new Emp(id, name, sal, did, date);
-			lst.add(id, emp);
+			lst.add(emp);
 		}
 		return lst;
 	}
@@ -73,7 +75,7 @@ public class EmpJdbcDao implements IDao {
 			double sal = rs.getDouble("sal");
 			int did = rs.getInt("dept_id");
 			String doj = rs.getString("doj");
-			DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-dd-MM HH:mm:SS");
+			DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:SS");
 			LocalDate date = LocalDate.parse(doj, df);
 			emp = new Emp(id, name, sal, did, date);
 		}
@@ -105,7 +107,6 @@ public class EmpJdbcDao implements IDao {
 		PreparedStatement st = conn.prepareStatement(sql);
 		st.setDouble(1, eid);
 		int rows = st.executeUpdate();
-
 		return rows;
 	}
 
