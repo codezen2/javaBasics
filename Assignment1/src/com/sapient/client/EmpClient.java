@@ -16,6 +16,7 @@ import com.sapient.dao.EmpJdbcDao;
 import com.sapient.dao.IDao;
 import com.sapient.exception.IdException;
 import com.sapient.exception.NotfoundException;
+import com.sapient.vo.Dept;
 import com.sapient.vo.Emp;
 
 public class EmpClient {
@@ -29,7 +30,7 @@ public class EmpClient {
 		Menu emenu = null;
 
 		do {
-			System.out.println("Choose:\nADD\nEDIT\nREMOVE\nVIEW\nVIEWALL\n:");
+			System.out.println("Choose:\nADD\nEDIT\nREMOVE\nVIEW\nVIEWALL\nDEPT\n:");
 			menuStr = scan.next();
 			try {
 				emenu = Menu.valueOf(menuStr.toUpperCase());
@@ -59,6 +60,9 @@ public class EmpClient {
 			break;
 		case EDIT:
 			updateSal();
+			break;
+		case DEPT:
+			viewDept();
 			break;
 		default:
 			break;
@@ -142,5 +146,20 @@ public class EmpClient {
 		}
 		System.out.println("Successfully Added");
 
+	}
+	public static void viewDept()
+	{
+		List<Dept> lst;
+		try {
+			System.out.println(" viewall fxn");
+			lst = EmpJdbcDao.getDepts();
+			System.out.println("sdsads " + lst.size());
+			for (Dept emp : lst) {
+				System.out.println(emp);
+			}
+		} catch (SQLException | ParseException e) {
+			System.out.println(e.getMessage() + "   " + e);
+		}
+		
 	}
 }

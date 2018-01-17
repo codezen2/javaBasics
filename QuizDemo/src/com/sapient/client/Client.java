@@ -25,7 +25,7 @@ public class Client {
 		System.out.println("--------------------------------------");
 
 		IExamSer ser = ExamSerImpl.getInstance();
-		List<Question> lst = ser.generateQuestions();
+		List<Question> lst = ser.generateQuestions(5);
 		List<Answer> alist=new ArrayList<Answer>();
 		Answer ans=null;
 		int i = 0;

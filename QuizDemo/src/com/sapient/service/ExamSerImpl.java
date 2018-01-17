@@ -34,9 +34,9 @@ public class ExamSerImpl implements IExamSer {
 
 
 	@Override
-	public List<Question> generateQuestions() {
+	public List<Question> generateQuestions(int nos) {
 		List<Question> lst=new ArrayList<Question>();
-		Set<Integer> qids = ExamUtill.generateUniqueNos(5,15);
+		Set<Integer> qids = ExamUtill.generateUniqueNos(nos,15);
 		Question ques=null;
 		for (int qno:qids) {
 			ques=qmap.get(qno);

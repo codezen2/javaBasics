@@ -1,6 +1,7 @@
 package com.sapient.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -54,7 +54,6 @@ public class EmpJdbcDao implements IDao {
 			DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:SS");
 			LocalDate date = LocalDate.parse(doj.toString(), df);
 			System.out.println(id + " " + name + " " + sal + " " + did + " " + date);
-
 			emp = new Emp(id, name, sal, did, date);
 			lst.add(emp);
 		}
@@ -90,14 +89,15 @@ public class EmpJdbcDao implements IDao {
 		String name = emp.getEmpName();
 		double sal = emp.getSal();
 		int did = emp.getDeptId();
-		Date d = new Date(System.currentTimeMillis());
+		LocalDate d = emp.getDoj();
 		st.setInt(1, id);
 		st.setString(2, name);
 		st.setDouble(3, sal);
 		st.setInt(4, did);
-		st.setDate(5, (java.sql.Date) d);
+		Date date = Date.valueOf(d);
+		st.setDate(5, date);
+		System.out.println(date);
 		int rows = st.executeUpdate();
-
 		return 1;
 	}
 
@@ -118,11 +118,10 @@ public class EmpJdbcDao implements IDao {
 		st.setDouble(1, sal);
 		st.setDouble(2, eid);
 		rows = st.executeUpdate();
-		conn.close();
 		return rows;
 	}
 
-	public List<Dept> getDepts() throws SQLException, ParseException {
+	public static List<Dept> getDepts() throws SQLException, ParseException {
 		String sql = null;
 		List<Dept> lst = new ArrayList<Dept>();
 		lst = null;
